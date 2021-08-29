@@ -2,6 +2,24 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 
+def show_image(img: tf.Tensor, title=None, img_size=None) -> None:
+    """
+    Pomocna funkcija za prikazivanja slika
+
+    :param img: Slika koja treba da se prikaze
+    :param title: Naslov koji ide uz sliku (opciono)
+    :param img_size: Dimenzija slike (opciono)
+    :return: None
+    """
+    fig, ax = plt.subplots(figsize=(6, 4))
+    if img_size is not None:
+        img = tf.reshape(img, shape=(img_size, img_size))
+    ax.imshow(img, cmap='gray')
+    ax.axis('off')
+    ax.set_title(title)
+    plt.show()
+
+
 def test_image_generation(gen_model, input_batch, target_batch, img_size, rows=4):
     """
     Pomocna funkcija za vizualizaciju perfomansi modela.

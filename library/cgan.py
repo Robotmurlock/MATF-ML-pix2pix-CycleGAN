@@ -1,8 +1,8 @@
 import tensorflow as tf
-from loss import generator_loss, discriminator_loss
-import time
-from visualization import test_image_generation
 from IPython import display
+import time
+from library.visualization import test_image_generation
+from library.loss import generator_loss, discriminator_loss
 
 
 class CGAN:
