@@ -32,3 +32,6 @@ Radovi koji čine osnovu:
 
 <a id="5">[5]</a> 
 [U-Net: Convolutional Networks for Biomedical Image Segmentation](https://arxiv.org/pdf/1505.05424.pdf)
+
+<a id="6">[6]</a>
+[Conditional Generative Adversarial Nets](https://arxiv.org/pdf/1411.1784.pdf)
