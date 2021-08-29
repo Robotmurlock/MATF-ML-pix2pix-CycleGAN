@@ -20,7 +20,7 @@ def show_image(img: tf.Tensor, title=None, img_size=None) -> None:
     plt.show()
 
 
-def test_image_generation(gen_model, input_batch, target_batch, img_size, rows=4):
+def test_image_generation(gen_model, input_batch, target_batch, img_size, rows=3):
     """
     Pomocna funkcija za vizualizaciju perfomansi modela.
     :param gen_model: Generator
@@ -32,6 +32,7 @@ def test_image_generation(gen_model, input_batch, target_batch, img_size, rows=4
     """
     assert rows <= input_batch.shape[0]
     prediction_batch = gen_model(input_batch, training=True)
+    channels = input_batch.shape[-1]
 
     fig, axs = plt.subplots(figsize=(18, 3 * rows), ncols=3, nrows=rows)
     for i in range(rows):
@@ -39,7 +40,11 @@ def test_image_generation(gen_model, input_batch, target_batch, img_size, rows=4
         i_img = input_batch[i]
         t_img = target_batch[i]
         for j, (img, title) in enumerate([(i_img, 'Input'), (t_img, 'Target'), (p_img, 'Prediction')]):
-            axs[i][j].imshow(tf.reshape(img, shape=(img_size, img_size)), cmap='gray')
+            new_shape = img_size, img_size, channels
+            if channels == 1:
+                new_shape = new_shape[:-1]
+            img_reshaped = tf.reshape(img, shape=new_shape)
+            axs[i][j].imshow(img_reshaped, cmap='gray')
             axs[i][j].set_title(title)
             axs[i][j].axis('off')
     plt.show()

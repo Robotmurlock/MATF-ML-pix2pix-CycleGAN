@@ -43,7 +43,7 @@ class UNetGeneratorBuilder:
 
     def __init__(self, input_size: int, output_channels: int):
         self.input_size = input_size
-        self.output_channels = output_channels
+        self.channels = output_channels
 
         self._encoder_layers = []
         self._encoder_layer_next_id = 1
@@ -93,7 +93,7 @@ class UNetGeneratorBuilder:
         assert len(self._decoder_layers) + 1 == len(self._encoder_layers)
         assert len(self._decoder_layers) <= n_power2(self.input_size)
 
-        inputs = layers.Input(shape=[self.input_size, self.input_size, 1], name='input')
+        inputs = layers.Input(shape=[self.input_size, self.input_size, self.channels], name='input')
         x = inputs
 
         # Encoder
@@ -110,7 +110,7 @@ class UNetGeneratorBuilder:
             x = layers.Concatenate()([x, skip])
 
         # Sa sigmoid aktivacionom funkcijom preslikavamo izlaz na [0, 1] interval
-        final_layer = layers.Conv2DTranspose(self.output_channels, 3, strides=2, padding='same', activation='sigmoid')
+        final_layer = layers.Conv2DTranspose(self.channels, 3, strides=2, padding='same', activation='sigmoid')
         x = final_layer(x)
 
         return keras.Model(inputs=inputs, outputs=x)

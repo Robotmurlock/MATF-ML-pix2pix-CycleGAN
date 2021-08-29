@@ -12,6 +12,7 @@ class CGAN:
                  alpha,
                  generator_optimizer,
                  discriminator_optimizer,
+                 img_size,
                  summary_writer=None,
                  checkpoint=None,
                  checkpoint_prefix=None
@@ -31,6 +32,8 @@ class CGAN:
         self.alpha = alpha
         self.generator_optimizer = generator_optimizer
         self.discriminator_optimizer = discriminator_optimizer
+
+        self.img_size = img_size
 
         self.summary_writer = summary_writer
         self.checkpoint = checkpoint
@@ -105,7 +108,6 @@ class CGAN:
             steps,
             test_generation_period=1000,
             n_test_examples=4,
-            img_size=32,
             checkpoint_period=5000):
         """
         Napomena: Namera je da se funkcija koristi u okviru IPython sveske
@@ -120,7 +122,6 @@ class CGAN:
         :param steps: Broj koraka treniranja
         :param test_generation_period: Broj koraka izmedju vizualizacije novih rezultata
         :param n_test_examples: Broj instanci koje se vizualizuju
-        :param img_size: Dimenzija slike koja se prikazuje u primerima
         :param checkpoint_period: Period za cuvanje rezultata
         :return: Loss History
         """
@@ -140,7 +141,7 @@ class CGAN:
                 start = time.time()
 
                 test_image_generation(
-                    self.generator, example_input, example_target, rows=n_test_examples, img_size=img_size)
+                    self.generator, example_input, example_target, rows=n_test_examples, img_size=self.img_size)
                 print(f"Step: {step+1}")
 
                 for val_input_image, val_target in val_ds:
