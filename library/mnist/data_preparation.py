@@ -64,7 +64,7 @@ def create_mnist_input(img, radius=4):
     return img_input, img
 
 
-def tf_pipeline(tf_dataset, img_size: int, batch_size: int):
+def tf_pipeline(tf_dataset, img_size: int, batch_size: int, noise: bool = True):
     """
     Funkcija za pripremu MNIST skupa podataka.
     Skup se prvenstveno konvertuje u odgovarajuci oblik,
@@ -74,6 +74,7 @@ def tf_pipeline(tf_dataset, img_size: int, batch_size: int):
     :param tf_dataset: Skup podataka
     :param img_size: Dimenzija slike (odnosi se na izlaz)
     :param batch_size: Dimenzija batch-a
+    :param noise: Da li je ukljucen sum
     :return: Pripremljen skup podataka
     """
     # noinspection PyUnresolvedReferences
@@ -85,8 +86,9 @@ def tf_pipeline(tf_dataset, img_size: int, batch_size: int):
     tf_dataset = tf_dataset.map(lambda x: tf.image.resize(x, (img_size, img_size), method='nearest'))
 
     # Neophodno je da postoji neka vrsta suma
-    tf_dataset = tf_dataset.map(lambda x: rotation(x))
-    tf_dataset = tf_dataset.map(lambda x: x if np.random.random() <= 0.5 else flip(x))
+    if noise:
+        tf_dataset = tf_dataset.map(lambda x: rotation(x))
+        tf_dataset = tf_dataset.map(lambda x: x if np.random.random() <= 0.5 else flip(x))
 
     # Dodavanje nasumicne "beline" na sliku
     tf_dataset = tf_dataset.map(create_mnist_input)
@@ -98,16 +100,17 @@ def tf_pipeline(tf_dataset, img_size: int, batch_size: int):
     return tf_dataset
 
 
-def prepare_mnist_dataset(dataset_name: str, img_size: int = 32, batch_size: int = 40):
+def prepare_mnist_dataset(dataset_name: str, img_size: int = 32, batch_size: int = 40, noise: bool = True):
     """
     Ucitavavanje i priprema MNIST skupa podataka.
 
     :param dataset_name: Ime skupa podataka ('fashion_mnist' ili 'mnist')
     :param img_size: Dimenzija slike u podacima
     :param batch_size: Dimenzija 'Batch'-a
+    :param noise: Da li je ukljucen sum
     :return: Skup podataka za ucenje i skup podataka za testiranje
     """
     tf_train, tf_test = load_data(dataset_name)
-    tf_train = tf_pipeline(tf_train, img_size, batch_size)
-    tf_test = tf_pipeline(tf_test, img_size, batch_size)
+    tf_train = tf_pipeline(tf_train, img_size, batch_size, noise)
+    tf_test = tf_pipeline(tf_test, img_size, batch_size, noise)
     return tf_train, tf_test
