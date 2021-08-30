@@ -138,8 +138,6 @@ class CGAN:
                 if step != 0:
                     print(f'Time taken for {step+1} steps: {time.time()-start:.2f} sec\n')
 
-                start = time.time()
-
                 test_image_generation(
                     self.generator, example_input, example_target, rows=n_test_examples, img_size=self.img_size)
                 print(f"Step: {step+1}")
