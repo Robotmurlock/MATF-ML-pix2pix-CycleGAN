@@ -75,8 +75,8 @@ def plot_history(history, axs, col, prefix=''):
     axs[2][col].set_ylabel('Loss')
 
     axs[3][col].plot(identity_x_loss, color='red', label='Total Identity[X] loss')
-    axs[3][col].plot(identity_y_loss, color='red', label='Total Identity[Y] loss')
-    axs[3][col].set_title(f'{prefix} DISC Loss')
+    axs[3][col].plot(identity_y_loss, color='blue', label='Total Identity[Y] loss')
+    axs[3][col].set_title(f'{prefix} Identity Loss')
     axs[3][col].set_xlabel('Step')
     axs[3][col].set_ylabel('Loss')
 
