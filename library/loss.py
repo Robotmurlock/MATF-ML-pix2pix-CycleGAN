@@ -9,7 +9,8 @@ def generator_loss(disc_generated_output, gen_output, target, alpha=1, loss_func
     if loss_func is None:
         loss_func = bce
 
-    # Kaznjava se Generator za svaku pogodjenu sliku diskriminatora
+    # Kaznjava se Generator za svaku pogodjenu sliku Diskriminatora
+    # Idealno za Generator je da Diskriminator kaže da su sve prave slike tj. jedinice.
     gan_loss = loss_func(tf.ones_like(disc_generated_output), disc_generated_output)
     # Dodaje se L1 greska kako bi se forsiralo da slike izgledaju vise kao obicne
     l1_loss = tf.reduce_mean(tf.abs(target - gen_output))

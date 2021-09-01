@@ -94,13 +94,21 @@ class CGAN:
         :param target: Prava slika
         :return: Loss
         """
-        gen_output = self.generator(input_image, training=True)
-        disc_real_output = self.discriminator([input_image, target], training=True)
-        disc_generated_output = self.discriminator([input_image, gen_output], training=True)
-        gen_total_loss, gen_gan_loss, gen_l1_loss = \
-            generator_loss(disc_generated_output, gen_output, target, alpha=self.alpha)
-        disc_loss = discriminator_loss(disc_real_output, disc_generated_output)
-        return gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss
+
+        def eval_step(self, input_image, target):
+            """
+            Evaluira rezultate za dati ulaz
+            :param input_image: Ulaz generatora
+            :param target: Prava slika
+            :return: Loss
+            """
+            gen_output = self.generator(input_image)
+            disc_real_output = self.discriminator([input_image, target])
+            disc_generated_output = self.discriminator([input_image, gen_output])
+            gen_total_loss, gen_gan_loss, gen_l1_loss = \
+                generator_loss(disc_generated_output, gen_output, target, alpha=self.alpha)
+            disc_loss = discriminator_loss(disc_real_output, disc_generated_output)
+            return gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss
 
     def fit(self,
             train_ds,
