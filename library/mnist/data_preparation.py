@@ -2,24 +2,39 @@ import tensorflow as tf
 from tensorflow.keras import layers
 import tensorflow_datasets as tfds
 import numpy as np
+from typing import Optional
 
 
-def load_data(dataset_name: str):
+def load_data(dataset_name: str, subset: Optional[int] = None):
     """
     Pomocna funkcija za ucitavanje MNIST skupa podataka
     :param dataset_name: Ime skupa podataka. U opticaju su
         - 'mnist'
         - 'fashion_mnist'
+    :param subset: Ako je 'None', onda se koristi ceo skup,
+        inace se koristi samo izabrana cifra
     :return: Skup podataka za ucenje i testiranje
     """
+    as_supervised = False
+    if subset is not None:
+        assert 0 <= subset <= 9, 'Only [0-9] integers are allowed!'
+        as_supervised = True
+
     assert dataset_name in ['mnist', 'fashion_mnist']
-    (tf_train, tf_test), ds_info = tfds.load(
+    tf_train, tf_test = tfds.load(
         dataset_name,
         split=['train', 'test'],
         shuffle_files=True,
-        as_supervised=False,
-        with_info=True,
+        as_supervised=as_supervised,
+        with_info=False,
     )
+
+    tf_train = tf_train.filter(lambda _, label: label == subset)
+    tf_train = tf_train.map(lambda img, _: img)
+
+    tf_test = tf_test.filter(lambda _, label: label == subset)
+    tf_test = tf_test.map(lambda img, _: img)
+
     return tf_train, tf_test
 
 
@@ -82,7 +97,7 @@ def tf_pipeline(tf_dataset, img_size: int, batch_size: int, noise: bool = True):
     flip = tf.keras.layers.RandomFlip()
 
     # Konvertovanje ulaza u sliku dimenzije [img_size]x[img_size]
-    tf_dataset = tf_dataset.map(lambda x: tf.cast(x['image'], tf.float32))
+    tf_dataset = tf_dataset.map(lambda x: tf.cast(x, tf.float32))
     tf_dataset = tf_dataset.map(lambda x: tf.image.resize(x, (img_size, img_size), method='nearest'))
 
     # Neophodno je da postoji neka vrsta suma
@@ -100,7 +115,14 @@ def tf_pipeline(tf_dataset, img_size: int, batch_size: int, noise: bool = True):
     return tf_dataset
 
 
-def prepare_mnist_dataset(dataset_name: str, img_size: int = 32, batch_size: int = 40, noise: bool = True):
+def prepare_mnist_dataset(
+        dataset_name: str,
+        img_size: int = 32,
+        batch_size: int = 40,
+        noise: bool = True,
+        *args,
+        **kwargs
+        ):
     """
     Ucitavavanje i priprema MNIST skupa podataka.
 
@@ -110,7 +132,7 @@ def prepare_mnist_dataset(dataset_name: str, img_size: int = 32, batch_size: int
     :param noise: Da li je ukljucen sum
     :return: Skup podataka za ucenje i skup podataka za testiranje
     """
-    tf_train, tf_test = load_data(dataset_name)
+    tf_train, tf_test = load_data(dataset_name, *args, **kwargs)
     tf_train = tf_pipeline(tf_train, img_size, batch_size, noise)
     tf_test = tf_pipeline(tf_test, img_size, batch_size, noise)
     return tf_train, tf_test
