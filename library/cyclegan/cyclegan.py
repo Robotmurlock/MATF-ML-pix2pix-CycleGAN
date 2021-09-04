@@ -44,22 +44,38 @@ class CycleGAN:
 
     @tf.function
     def train_step(self, real_images_x, real_images_y):
+        """
+        Proces učenja:
+        1. Generisanje slika za skup Y preko generatora G i skup X preko generatora F;
+        2. Generisanje cikličnih slika na osnovu slika generisanih u prethodnom koraku;
+        3. Primena generatora G na skup Y i generatora F na skup X (greška identiteta);
+        4. Primena diskriminatora na prave slike
+        5. Primena diskriminatora na generisane slike
+        6. Izračunavanje vrednosti svih prethodno navedenih funkcija grešaka redom:
+            - greška generatora G i F
+            - greška diskriminatora X i Y
+            - ciklična greška
+            - greška identiteta
+        7. Obrada sledećeg koraka gradijentnog spusta.
+        """
         with tf.GradientTape(persistent=True) as tape:
+            # 1
             fake_images_y = self.gen_g(real_images_x, training=True)
             fake_images_x = self.gen_f(real_images_y, training=True)
-
+            # 2
             cycled_images_x = self.gen_f(fake_images_y, training=True)
             cycled_images_y = self.gen_g(fake_images_x, training=True)
-
+            # 3
             same_images_x = self.gen_f(real_images_x, training=True)
             same_images_y = self.gen_g(real_images_y, training=True)
-
+            # 4
             disc_real_images_x = self.disc_x(real_images_x, training=True)
             disc_real_images_y = self.disc_y(real_images_y, training=True)
-
+            # 5
             disc_fake_images_x = self.disc_x(fake_images_x, training=True)
             disc_fake_images_y = self.disc_y(fake_images_y, training=True)
 
+            # 6
             gen_g_loss = generator_loss(disc_fake_images_y, self.gen_alpha)
             gen_f_loss = generator_loss(disc_fake_images_x, self.gen_alpha)
 
@@ -91,7 +107,7 @@ class CycleGAN:
         self.disc_y_optim.apply_gradients(zip(disc_y_gradients, self.disc_y.trainable_variables))
 
         return gen_g_loss, gen_f_loss, disc_x_loss, disc_y_loss, \
-               total_cycled_loss, identity_x_loss, identity_y_loss
+            total_cycled_loss, identity_x_loss, identity_y_loss
 
     def eval_step(self, real_images_x, real_images_y):
         """
@@ -128,11 +144,8 @@ class CycleGAN:
         identity_x_loss = identity_loss(real_images_x, same_images_x, self.cycle_alpha, self.identity_beta)
         identity_y_loss = identity_loss(real_images_y, same_images_y, self.cycle_alpha, self.identity_beta)
 
-        total_gen_g_loss = gen_g_loss + total_cycled_loss + identity_y_loss
-        total_gen_f_loss = gen_f_loss + total_cycled_loss + identity_x_loss
-
         return gen_g_loss, gen_f_loss, disc_x_loss, disc_y_loss, \
-               total_cycled_loss, identity_x_loss, identity_y_loss
+            total_cycled_loss, identity_x_loss, identity_y_loss
 
     def fit(self,
             train_ds,

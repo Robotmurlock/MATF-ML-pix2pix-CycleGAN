@@ -1,7 +1,8 @@
 # CycleGAN and pix2pix 
 
 Projekat je rađen u okviru kursa "Mašinsko Učenje" 
-na Matematičkom fakultetu.
+na Matematičkom fakultetu. Grana `predaja` obuhvata
+sve izmene do `01.09.2021.g.`
 
 Originalni Github repozitorijumi:
 - [CycleGAN](https://github.com/junyanz/CycleGAN)
@@ -12,9 +13,16 @@ Radovi koji čine osnovu:
 - [CycleGAN](https://arxiv.org/pdf/1703.10593.pdf)
 - [pix2pix](https://arxiv.org/pdf/1611.07004.pdf)
 
-# pix2pix
+## Paketi
 
-# CycleGAN
+```
+tensorflow==2.6.0
+matplotlib==3.4.1
+numpy==1.19.2
+pandas==1.2.4
+tensorflow-datasets==4.4.0
+Pillow==7.0.0
+```
 
 ## Literatura
 
